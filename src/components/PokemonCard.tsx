@@ -2,66 +2,46 @@ import { PokeData } from '@/types'
 import { Card, CardHeader, Text, CardBody, Flex, Box, useBreakpointValue, Image, CardFooter } from '@chakra-ui/react'
 import React from 'react'
 import PokemonType from './PokemonType'
+import PokemonDetails from './PokemonDetails';
+
+interface PokemonCardType {
+    poke: PokeData;
+}
 
 
-const PokemonCard = ({ name, stats, sprites, types }: PokeData) => {
+const PokemonCard = ({ poke }: PokemonCardType) => {
 
     return (
         <Card flexDirection="column" textColor="white" bg="black">
-            <CardHeader display="flex" flexDirection="column" gap={2} justifyContent="center" padding={0}>
-                <Text fontSize="4xl" textTransform="capitalize" fontWeight="bold" textAlign="center">
-                    {name}
+            <CardHeader display="flex" flexDirection="column" gap={1} justifyContent="center" padding={0}>
+                <Text textAlign="end" paddingEnd={2} paddingTop={1}>
+                    #{poke.id}
+                </Text>
+                <Text fontSize="xl" textTransform="capitalize" fontWeight="bold" textAlign="center">
+                    {poke.name}
                 </Text>
                 <Flex direction="row" gap={4} justifyContent="center">
-                    <PokemonType types={types} />
-                </Flex>
+                <PokemonType poke={poke} />
+            </Flex>
             </CardHeader>
-            {!!stats && (
+            {!!poke.stats && (
                 <CardBody
-                    flexDirection="column" borderRadius={16} maxH={300} marginBottom={16}
+                    borderRadius={16} maxH={300} paddingY={0}
                 >
-                    <Box
-                        display="flex"
-                        justifyContent="between"
-                        textAlign="center"
-                        alignItems="center"
-                    >
-                        {stats.map((value, index) => (
-                            <Box key={index} display="flex" flexDirection="column"
-                            >
-                                <Text
-                                    textTransform="capitalize"
-                                    fontWeight='bold'>{value.stat.name}</Text>
-                                <Text
-                                    color='red.500'>
-                                    {value.base_stat}
-                                </Text>
-                            </Box>
-                        ))}
-                    </Box>
+                    {!!poke.sprites && (
+                        <Image src={poke.sprites.front_default} alt="Pokemon front" width={150} height={150} />
+                    )}
                 </CardBody>
             )}
-            {!!sprites && (
-                <CardFooter
-                    gap={4}
-                    bg="gray"
-                    borderRadius={16}
-                    alignItems="center"
-                    justifyContent="center"
-                    paddingX={4}
-                    borderColor="white"
-                >
-                    <Image src={sprites.front_default} alt="Pokemon front" w={150} h={150} />
-                    <Box as="div" border="1px" h={40} display={`${!sprites.back_default ? "none" : ""}`} />
-                    <Image
-                        src={sprites.back_default}
-                        display={`${!sprites.back_default ? "none" : ""}`}
-                        alt="Pokemon back"
-                        w={150} h={150} />
-                </CardFooter>
-            )}
-
+            <CardFooter
+                alignItems="center"
+                justifyContent="center"
+                padding={0}
+            >
+                <PokemonDetails poke={poke} />
+            </CardFooter>
         </Card>
+
     )
 }
 

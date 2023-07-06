@@ -2,10 +2,15 @@ import { PokeData } from '@/types'
 import React from 'react'
 import { Image } from '@chakra-ui/react'
 import { getTypeImageAndAlt } from '../utils/PokeType'
-const PokemonType = ({ types }: PokeData) => {
+
+interface PokemonTypeType {
+    poke: PokeData;
+}
+
+const PokemonType = ({ poke }: PokemonTypeType) => {
     return (
         <>
-            {!!types && types.map((type, key) => {
+            {!!poke.types && poke.types.map((type, key) => {
                 const { typeImage, altImage } = getTypeImageAndAlt(type.type.name);
                 return (
                     <Image

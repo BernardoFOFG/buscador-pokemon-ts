@@ -16,6 +16,10 @@ export function getTypeImageAndAlt(typeName) {
             typeImage = "/flying.svg";
             altImage = "flying";
             break;
+        case "poison":
+            typeImage = "/poison.svg";
+            altImage = "poison";
+            break;
         case "ground":
             typeImage = "/ground.svg";
             altImage = "ground";

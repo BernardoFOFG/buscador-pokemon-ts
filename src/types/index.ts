@@ -1,14 +1,14 @@
-import { type } from "os";
-
 export interface FormData {
     pokeName: string;
 }
 
 export interface PokeData {
     name?: string;
+    id?: number;
     stats?: statsType[];
     sprites?: spritesType;
     types?: typesType[];
+    abilities?: attacksType[];
 }
 
 export interface statsType {
@@ -25,8 +25,12 @@ export interface spritesType {
 
 export interface typesType {
     type: {
-        type: {
-            name: ""
-        }
+        name: string;
+    }
+}
+
+export interface attacksType {
+    ability: {
+        name: string;
     }
 }

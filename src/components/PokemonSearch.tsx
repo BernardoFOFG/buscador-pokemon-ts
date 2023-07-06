@@ -1,68 +1,97 @@
 import React, { useEffect, useState } from 'react';
-import { Input, FormControl, Button, Text, Box, CardFooter, Image, CardBody, Card, CardHeader, Flex } from '@chakra-ui/react';
-import { useForm } from 'react-hook-form';
+import { Input, Button, Flex, Grid, Box, Text, Collapse, useBreakpointValue } from '@chakra-ui/react';
 import axios from 'axios';
-import { FormData, PokeData } from '@/types';
 import PokemonCard from './PokemonCard';
+import { PokeData } from '@/types';
 
-
+interface PokeNameType {
+    id: number;
+    name: string;
+}
 
 const PokemonSearch = () => {
-    const [pokemonName, setPokemonName] = useState("");
-    const [error, setError] = useState(" ");
-    const [data, setData] = useState<PokeData>({
-        name: "", stats: [{ base_stat: "", stat: { name: "" } }],
-        sprites: {
-            front_default: "",
-            back_default: ""
-        },
-        types: [{
-            type: {
-                name: ""
-            }
-        }]
-    });
+    const [data, setData] = useState<PokeNameType[]>([]);
+    const [filter, setFilter] = useState("");
+    const [totalItems, setTotalItems] = useState(0);
+    const [prevPage, setPrevPage] = useState("");
+    const [nextPage, setNextPage] = useState("");
+    const [poke, setPoke] = useState<PokeData[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
-            try {
-                const response = await axios.get(
-                    `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
-                );
-                setData(response.data);
-                setError("");
-            } catch (error) {
-                let errorMessage = "Pokemon não encontrado";
-                if (error instanceof Error) {
-                    setError(errorMessage)
-                }
-            }
+            const response = await axios.get(
+                `https://pokeapi.co/api/v2/pokemon?limit=10&offset=${totalItems}`
+            );
+            setData(response.data.results);
+            setPrevPage(response.data.previous);
+            setNextPage(response.data.next);
         };
-        if (pokemonName) {
-            fetchData();
+        fetchData();
+    }, [totalItems]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const newPokeData: PokeData[] = [];
+            for (let i = 0; i < data.length; i++) {
+                const response = await axios.get(
+                    `https://pokeapi.co/api/v2/pokemon/${data[i].name}`
+                );
+                newPokeData.push(response.data);
+            }
+            setPoke(newPokeData);
+        };
+        fetchData();
+    }, [data]);
+
+    function onNextPage() {
+        setTotalItems(totalItems + 20);
+        setPoke([]);
+    }
+
+    function onPrevPage() {
+        if (prevPage !== null) {
+            setTotalItems(totalItems - 20);
+            setPoke([]);
         }
-    }, [pokemonName]);
+    }
 
-    const { register, handleSubmit } = useForm<FormData>();
+    const filteredData = poke.filter((item) => item.name && item.name.includes(filter.toLowerCase()) || item.id && item.id.toString().includes(filter));
 
-    const onSubmit = (data: FormData) => {
-        setPokemonName(data.pokeName);
-    };
+    // Obtenha o valor responsivo para o número de colunas do Grid
+    const gridColumns = useBreakpointValue({ base: 1, md: 3, lg: 5 });
 
     return (
         <>
-            <FormControl as="form" onSubmit={handleSubmit(onSubmit)} maxW={400}>
-                <Input
-                    type="text"
-                    {...register('pokeName')}
-                    placeholder="Insira o nome do Pokemon"
-                />
+            <Flex as="main" alignItems="center" flexDirection="column" bgColor="blackAlpha.900" minH="100vh">
+                <Box maxWidth={400} minH="20%" h="20%" marginBottom={8}>
+                    <Text
+                        bgGradient='linear(to-l, #7980CC, #FF0000)'
+                        bgClip='text'
+                        fontSize='6xl'
+                        fontWeight='extrabold'
+                    >Pokedex</Text>
+                    <Input
+                        type="text"
+                        placeholder="Insira o nome do Pokemon"
+                        textColor="white"
+                        onChange={(e) => setFilter(e.target.value)}
+                    />
+                </Box>
 
-                <Button type="submit">Enviar</Button>
-            </FormControl>
+                <Flex gap={4} marginBottom={8}>
+                    <Button onClick={onPrevPage} disabled={prevPage === null} colorScheme='red'>&#60;</Button>
+                    <Button onClick={onNextPage} colorScheme='red'>&#62;</Button>
+                </Flex>
+                <Collapse in={data.length > 0}>
+                    <Grid templateColumns={`repeat(${gridColumns}, 1fr)`} gap={4}>
+                        {filteredData.map((item) => (
+                            <PokemonCard key={item.name} poke={item} />
+                        ))}
+                    </Grid>
+                </Collapse>
 
-            <PokemonCard name={data.name} stats={data.stats} sprites={data.sprites} types={data.types} />
-            {error}
+
+            </Flex>
         </>
     );
 };
