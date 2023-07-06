@@ -17,7 +17,6 @@ const PokemonStatus = ({ poke }: PokemonStatusType) => {
                     </Box>
                 )
                 ))}
-
         </>
     )
 }

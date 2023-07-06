@@ -12,7 +12,6 @@ import {
     Button,
     Flex,
     Text,
-    Box,
     Image
 } from '@chakra-ui/react'
 import PokemonAtributes from './PokemonAtributes';
@@ -26,7 +25,8 @@ const PokemonDetails = ({ poke }: PokemonDetailsType) => {
 
     return (
         <>
-            <Button onClick={onOpen}>Detalhes</Button>
+            <Button onClick={onOpen} width="100%"
+            borderTopRadius={0}>Detalhes</Button>
 
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
@@ -34,7 +34,7 @@ const PokemonDetails = ({ poke }: PokemonDetailsType) => {
                     <ModalHeader><Text textTransform="capitalize">{poke.name}</Text></ModalHeader>
                     <ModalCloseButton />
                     <ModalBody display="flex" justifyContent="center">
-                        <Flex>
+                        <Flex width="100%">
                             <PokemonAtributes poke={poke} />
                         </Flex>
                     </ModalBody>

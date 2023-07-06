@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Button, Flex, Grid, Box, Text, Collapse, useBreakpointValue } from '@chakra-ui/react';
+import { Input, Button, Flex, Grid, Box, Text, Collapse, useBreakpointValue, Spinner } from '@chakra-ui/react';
 import axios from 'axios';
 import PokemonCard from './PokemonCard';
 import { PokeData } from '@/types';
@@ -16,15 +16,18 @@ const PokemonSearch = () => {
     const [prevPage, setPrevPage] = useState("");
     const [nextPage, setNextPage] = useState("");
     const [poke, setPoke] = useState<PokeData[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             const response = await axios.get(
                 `https://pokeapi.co/api/v2/pokemon?limit=10&offset=${totalItems}`
             );
             setData(response.data.results);
             setPrevPage(response.data.previous);
             setNextPage(response.data.next);
+            setLoading(false);
         };
         fetchData();
     }, [totalItems]);
@@ -49,15 +52,11 @@ const PokemonSearch = () => {
     }
 
     function onPrevPage() {
-        if (prevPage !== null) {
-            setTotalItems(totalItems - 20);
-            setPoke([]);
-        }
+        setTotalItems(totalItems - 20);
+        setPoke([]);
     }
 
     const filteredData = poke.filter((item) => item.name && item.name.includes(filter.toLowerCase()) || item.id && item.id.toString().includes(filter));
-
-    // Obtenha o valor responsivo para o número de colunas do Grid
     const gridColumns = useBreakpointValue({ base: 1, md: 3, lg: 5 });
 
     return (
@@ -77,20 +76,22 @@ const PokemonSearch = () => {
                         onChange={(e) => setFilter(e.target.value)}
                     />
                 </Box>
-
-                <Flex gap={4} marginBottom={8}>
-                    <Button onClick={onPrevPage} disabled={prevPage === null} colorScheme='red'>&#60;</Button>
-                    <Button onClick={onNextPage} colorScheme='red'>&#62;</Button>
-                </Flex>
                 <Collapse in={data.length > 0}>
                     <Grid templateColumns={`repeat(${gridColumns}, 1fr)`} gap={4}>
-                        {filteredData.map((item) => (
-                            <PokemonCard key={item.name} poke={item} />
-                        ))}
+                        {loading ? (
+                            <Spinner color='red' />
+                        ) : (
+                            filteredData.map((item) => (
+                                <PokemonCard key={item.name} poke={item} />
+                            ))
+                        )}
                     </Grid>
                 </Collapse>
 
-
+                <Flex gap={4} marginBottom={8} width="100%" marginTop={4} justifyContent="end" marginRight={64}>
+                    <Button onClick={onPrevPage} isDisabled={prevPage !== null ? false : true} colorScheme='red'>&#60;</Button>
+                    <Button onClick={onNextPage} colorScheme='red'>&#62;</Button>
+                </Flex>
             </Flex>
         </>
     );

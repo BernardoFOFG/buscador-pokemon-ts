@@ -1,5 +1,5 @@
 import { PokeData } from '@/types'
-import { Card, CardHeader, Text, CardBody, Flex, Box, useBreakpointValue, Image, CardFooter } from '@chakra-ui/react'
+import { Card, CardHeader, Text, CardBody, Flex, Image, CardFooter } from '@chakra-ui/react'
 import React from 'react'
 import PokemonType from './PokemonType'
 import PokemonDetails from './PokemonDetails';
@@ -10,7 +10,6 @@ interface PokemonCardType {
 
 
 const PokemonCard = ({ poke }: PokemonCardType) => {
-
     return (
         <Card flexDirection="column" textColor="white" bg="black">
             <CardHeader display="flex" flexDirection="column" gap={1} justifyContent="center" padding={0}>
@@ -21,8 +20,8 @@ const PokemonCard = ({ poke }: PokemonCardType) => {
                     {poke.name}
                 </Text>
                 <Flex direction="row" gap={4} justifyContent="center">
-                <PokemonType poke={poke} />
-            </Flex>
+                    <PokemonType poke={poke} />
+                </Flex>
             </CardHeader>
             {!!poke.stats && (
                 <CardBody
